@@ -1,0 +1,22 @@
+{
+  "terminal.integrated.profiles.osx": {
+    "zsh-dotfiles": {
+      "path": "/bin/zsh",
+      "args": ["-l"],
+      "icon": "terminal-zsh"
+    }
+  },
+  "terminal.integrated.defaultProfile.osx": "zsh-dotfiles",
+  "terminal.integrated.fontFamily": "FiraCode Nerd Font, Menlo, Monaco, Courier New, monospace",
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.lineHeight": 1.2,
+  "terminal.integrated.gpuAcceleration": "auto",
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.cursorStyle": "block",
+  "terminal.integrated.shellIntegration.enabled": true,
+  "security.workspace.trust.untrustedFiles": "open",
+  "workbench.colorTheme": "Dracula Theme Soft",
+  "editor.fontFamily": "FiraCode Nerd Font, Menlo, Monaco, Courier New, monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14
+}

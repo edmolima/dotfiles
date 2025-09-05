@@ -1,0 +1,61 @@
+# VS Code Extensions Configuration
+
+extensions:
+  
+  # Theme & Visual
+  theme:
+    - id: dracula-theme.theme-dracula
+      name: "Dracula Official"
+      description: "Dark theme for many editors, shells, and more"
+    
+    - id: file-icons.file-icons
+      name: "File Icons"
+      description: "File-specific icons in VS Code for improved visual grepping"
+
+  # Language Support
+  languages:
+    - id: ms-vscode.vscode-typescript-next
+      name: "TypeScript Importer"
+      description: "TypeScript and JavaScript language support"
+    
+    - id: ms-python.python
+      name: "Python"
+      description: "IntelliSense, linting, debugging for Python"
+    
+    - id: bradlc.vscode-tailwindcss
+      name: "Tailwind CSS IntelliSense"
+      description: "Intelligent Tailwind CSS tooling"
+
+  # Formatting & Code Quality
+  formatting:
+    - id: esbenp.prettier-vscode
+      name: "Prettier"
+      description: "Code formatter using prettier"
+    
+    - id: dbaeumer.vscode-eslint
+      name: "ESLint"
+      description: "Integrates ESLint JavaScript into VS Code"
+    
+    - id: stylelint.vscode-stylelint
+      name: "Stylelint"
+      description: "Modern CSS/SCSS/Less linter"
+
+  # Git & Version Control
+  git:
+    - id: eamodio.gitlens
+      name: "GitLens"
+      description: "Supercharge Git within VS Code"
+
+  # Web Development
+  web:
+    - id: zignd.html-css-class-completion
+      name: "IntelliSense for CSS class names"
+      description: "CSS class name completion for HTML"
+    
+    - id: naumovs.color-highlight
+      name: "Color Highlight"
+      description: "Highlight web colors in your editor"
+    
+    - id: ritwickdey.liveserver
+      name: "Live Server"
+      description: "Launch a development local Server with live reload"
