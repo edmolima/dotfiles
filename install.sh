@@ -206,6 +206,42 @@ else
 fi
 
 # ------------------------------
+# PRODUCTIVITY APPS
+# ------------------------------
+print_header "PRODUCTIVITY APPLICATIONS"
+
+# Raycast
+if [ -f "$DOTFILES/raycast/setup.sh" ]; then
+    print_step "Running Raycast modular setup..."
+    chmod +x "$DOTFILES/raycast/setup.sh"
+    "$DOTFILES/raycast/setup.sh"
+else
+    print_warning "Raycast setup script not found at $DOTFILES/raycast/setup.sh"
+fi
+
+# Obsidian
+if [ -f "$DOTFILES/obsidian/setup.sh" ]; then
+    print_step "Running Obsidian modular setup..."
+    chmod +x "$DOTFILES/obsidian/setup.sh"
+    "$DOTFILES/obsidian/setup.sh"
+else
+    print_warning "Obsidian setup script not found at $DOTFILES/obsidian/setup.sh"
+fi
+
+# Grammarly Desktop
+print_step "Installing Grammarly Desktop..."
+if ! ls /Applications/ | grep -q "Grammarly Desktop.app"; then
+    if command -v brew &> /dev/null; then
+        brew install --cask grammarly-desktop
+        print_success "Grammarly Desktop installed"
+    else
+        print_warning "Homebrew not available. Please install Grammarly Desktop manually"
+    fi
+else
+    print_success "Grammarly Desktop already installed"
+fi
+
+# ------------------------------
 # VS CODE SETUP (MODULAR)
 # ------------------------------
 print_header "VS CODE CONFIGURATION"
@@ -232,6 +268,7 @@ echo "│ 🐚 Zsh: $ZSHRC_FILE → ~/.zshrc"
 echo "│ 🎨 Theme: Powerlevel10k with plugins"
 echo "│ 🔧 Tools: NVM, Node.js, pnpm, Homebrew"
 echo "│ 🔤 Font: Fira Code Nerd Font"
+echo "│ 🚀 Raycast: Productivity launcher"
 echo "│ 💻 VS Code: Dracula theme + extensions"
 echo "└─────────────────────────────────────────────────────────────┘"
 echo ""
@@ -239,9 +276,11 @@ echo -e "${BLUE}📁 Dotfiles Structure:${NC}"
 echo "📁 $DOTFILES/"
 echo "├── 📄 .zshrc (or zshrc)"
 echo "├── 📄 p10k.zsh"
+echo "├── 📁 raycast/"
+echo "│   └── 📄 setup.sh"
 echo "├── 📁 vscode/"
 echo "│   ├── 📄 settings.json"
-echo "│   ├── 📄 extensions.txt"
+echo "│   ├── 📄 extensions.yml"
 echo "│   └── 📄 setup.sh"
 echo "├── 📄 setup.sh (this script)"
 echo "└── 📁 oh-my-zsh/"
@@ -251,6 +290,7 @@ echo "1. Close and reopen your terminal (or run 'source ~/.zshrc')"
 if [ ! -f "$DOTFILES/p10k.zsh" ]; then
     echo "2. Run 'p10k configure' to set up your Powerlevel10k theme"
 fi
-echo "3. Your configuration is now consistent across all terminals!"
+echo "3. Complete initial setup for Raycast, Obsidian, and Grammarly"
+echo "4. Your configuration is now consistent across all terminals and apps!"
 echo ""
 echo -e "${GREEN}Happy coding! 🎯${NC}"
