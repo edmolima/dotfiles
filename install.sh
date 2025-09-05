@@ -42,6 +42,10 @@ print_error() {
 if [ "$PWD" != "$DOTFILES" ]; then
     print_error "Please run this script from the dotfiles directory: $DOTFILES"
     print_error "Current directory: $PWD"
+    echo ""
+    echo "To fix this:"
+    echo "  cd $DOTFILES"
+    echo "  ./setup.sh"
     exit 1
 fi
 
@@ -55,9 +59,17 @@ print_header "ZSH & TERMINAL CONFIGURATION"
 print_step "Setting up Oh-My-Zsh"
 if [ ! -d "$ZSH" ]; then
     git clone https://github.com/ohmyzsh/ohmyzsh.git "$ZSH"
-    print_success "Oh-My-Zsh installed"
+    print_success "Oh-My-Zsh installed to $ZSH"
 else
     print_success "Oh-My-Zsh already exists"
+fi
+
+# Verify the main file exists
+if [ ! -f "$ZSH/oh-my-zsh.sh" ]; then
+    print_error "Oh-My-Zsh main file not found, reinstalling..."
+    rm -rf "$ZSH"
+    git clone https://github.com/ohmyzsh/ohmyzsh.git "$ZSH"
+    print_success "Oh-My-Zsh reinstalled"
 fi
 
 print_step "Setting up Powerlevel10k theme"
@@ -93,6 +105,7 @@ elif [ -f "$DOTFILES/zshrc" ]; then
     ZSHRC_FILE="$DOTFILES/zshrc"
 else
     print_error "No zshrc file found in dotfiles"
+    print_error "Please ensure you have either .zshrc or zshrc in $DOTFILES"
     exit 1
 fi
 
@@ -110,6 +123,22 @@ fi
 # ------------------------------
 print_header "DEVELOPMENT TOOLS SETUP"
 
+print_step "Setting up Homebrew"
+if ! command -v brew &> /dev/null; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    # Add Homebrew to PATH for current session
+    if [[ -d "/opt/homebrew/bin" ]]; then
+        export PATH="/opt/homebrew/bin:$PATH"
+    elif [[ -d "/usr/local/bin" ]]; then
+        export PATH="/usr/local/bin:$PATH"
+    fi
+    
+    print_success "Homebrew installed"
+else
+    print_success "Homebrew already installed"
+fi
+
 # Git Configuration
 if [ -f "$DOTFILES/git/setup.sh" ]; then
     print_step "Running Git configuration setup..."
@@ -117,20 +146,7 @@ if [ -f "$DOTFILES/git/setup.sh" ]; then
     "$DOTFILES/git/setup.sh"
 else
     print_warning "Git setup script not found at $DOTFILES/git/setup.sh"
-fi
-
-print_step "Setting up Homebrew"
-if ! command -v brew &> /dev/null; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    print_success "Homebrew installed"
-    
-    if [[ -d "/opt/homebrew/bin" ]]; then
-        export PATH="/opt/homebrew/bin:$PATH"
-    elif [[ -d "/usr/local/bin" ]]; then
-        export PATH="/usr/local/bin:$PATH"
-    fi
-else
-    print_success "Homebrew already installed"
+    print_warning "Git will use default configuration"
 fi
 
 print_step "Setting up Node.js environment"
@@ -150,7 +166,8 @@ if ! command -v node &> /dev/null; then
         nvm alias default lts/*
         print_success "Node.js LTS installed"
     else
-        print_warning "NVM not available. Please restart terminal and run: nvm install --lts"
+        print_warning "NVM not available in current session"
+        print_warning "Please restart terminal and run: nvm install --lts"
     fi
 else
     print_success "Node.js already installed ($(node --version))"
@@ -160,6 +177,8 @@ if ! command -v pnpm &> /dev/null; then
     if command -v npm &> /dev/null; then
         npm install -g pnpm
         print_success "pnpm installed"
+    else
+        print_warning "npm not available. Install pnpm manually after Node.js setup"
     fi
 else
     print_success "pnpm already installed ($(pnpm --version))"
@@ -203,6 +222,8 @@ else
                 if ls *.ttf >/dev/null 2>&1; then
                     cp *.ttf ~/Library/Fonts/
                     print_success "Fira Code Nerd Font installed manually"
+                else
+                    print_warning "No TTF files found in download"
                 fi
             else
                 print_warning "Failed to download font. Please install manually"
@@ -211,6 +232,8 @@ else
             cd "$ORIGINAL_DIR"
             rm -rf "$TEMP_DIR"
         fi
+    else
+        print_warning "Homebrew not available. Please install font manually"
     fi
 fi
 
@@ -221,7 +244,7 @@ print_header "PRODUCTIVITY APPLICATIONS"
 
 # Raycast
 if [ -f "$DOTFILES/raycast/setup.sh" ]; then
-    print_step "Running Raycast modular setup..."
+    print_step "Running Raycast setup..."
     chmod +x "$DOTFILES/raycast/setup.sh"
     "$DOTFILES/raycast/setup.sh"
 else
@@ -230,7 +253,7 @@ fi
 
 # Obsidian
 if [ -f "$DOTFILES/obsidian/setup.sh" ]; then
-    print_step "Running Obsidian modular setup..."
+    print_step "Running Obsidian setup..."
     chmod +x "$DOTFILES/obsidian/setup.sh"
     "$DOTFILES/obsidian/setup.sh"
 else
@@ -250,67 +273,4 @@ else
     print_success "Grammarly Desktop already installed"
 fi
 
-# ------------------------------
-# VS CODE SETUP (MODULAR)
-# ------------------------------
-print_header "VS CODE CONFIGURATION"
-
-if [ -f "$DOTFILES/vscode/setup.sh" ]; then
-    print_step "Running VS Code modular setup..."
-    chmod +x "$DOTFILES/vscode/setup.sh"
-    "$DOTFILES/vscode/setup.sh"
-else
-    print_warning "VS Code setup script not found at $DOTFILES/vscode/setup.sh"
-fi
-
-# ------------------------------
-# FINAL SUMMARY
-# ------------------------------
-print_header "SETUP COMPLETE!"
-
-echo -e "${GREEN}🎉 Complete development environment setup finished!${NC}"
-echo ""
-echo -e "${BLUE}📋 Configuration Summary:${NC}"
-echo "┌─────────────────────────────────────────────────────────────┐"
-echo "│ 🐚 Terminal: Zsh + Oh-My-Zsh + Powerlevel10k               │"
-echo "│ 🔧 Development: Git, Homebrew, NVM, Node.js, pnpm          │"
-echo "│ 🔤 Font: Fira Code Nerd Font                               │"
-echo "│ 🚀 Productivity: Raycast, Obsidian, Grammarly             │"
-echo "│ 💻 Editor: VS Code with Dracula theme + extensions        │"
-echo "└─────────────────────────────────────────────────────────────┘"
-echo ""
-echo -e "${BLUE}📁 Dotfiles Structure:${NC}"
-echo "📁 $DOTFILES/"
-echo "├── 📄 .zshrc (symlinked to ~/.zshrc)"
-echo "├── 📄 p10k.zsh (Powerlevel10k configuration)"
-echo "├── 📁 git/"
-echo "│   └── 📄 setup.sh (Git user configuration)"
-echo "├── 📁 raycast/"
-echo "│   └── 📄 setup.sh (Launcher setup)"
-echo "├── 📁 obsidian/"
-echo "│   └── 📄 setup.sh (Knowledge management)"
-echo "├── 📁 vscode/"
-echo "│   ├── 📄 settings.json (Editor configuration)"
-echo "│   ├── 📄 extensions.yml (Extensions list)"
-echo "│   ├── 📄 setup.sh (Editor setup)"
-echo "│   └── 📄 fix.sh (Repair tool)"
-echo "├── 📄 setup.sh (this main script)"
-echo "└── 📁 oh-my-zsh/ (terminal framework)"
-echo ""
-echo -e "${BLUE}🚀 Next Steps:${NC}"
-echo "1. Close and reopen your terminal (or run 'source ~/.zshrc')"
-if [ ! -f "$DOTFILES/p10k.zsh" ]; then
-    echo "2. Run 'p10k configure' to customize your terminal theme"
-fi
-echo "3. Test your Git configuration with 'git config --list'"
-echo "4. Press ⌘+Space to test Raycast launcher"
-echo "5. Open VS Code and verify Dracula theme and extensions"
-echo "6. Create your first Obsidian vault for knowledge management"
-echo ""
-echo -e "${BLUE}🔧 Individual Module Setup:${NC}"
-echo "  ./git/setup.sh      → Configure Git credentials only"
-echo "  ./vscode/setup.sh   → Install VS Code extensions only"
-echo "  ./raycast/setup.sh  → Setup Raycast launcher only"
-echo "  ./obsidian/setup.sh → Install Obsidian only"
-echo ""
-echo -e "${GREEN}Your complete development environment is ready! 🎯${NC}"
+# -----------
