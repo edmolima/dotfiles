@@ -45,7 +45,7 @@ if [ "$PWD" != "$DOTFILES" ]; then
     exit 1
 fi
 
-print_header "DOTFILES SETUP - MODULAR CONFIGURATION"
+print_header "DOTFILES SETUP - COMPLETE DEVELOPMENT ENVIRONMENT"
 
 # ------------------------------
 # ZSH & TERMINAL SETUP
@@ -110,6 +110,29 @@ fi
 # ------------------------------
 print_header "DEVELOPMENT TOOLS SETUP"
 
+# Git Configuration
+if [ -f "$DOTFILES/git/setup.sh" ]; then
+    print_step "Running Git configuration setup..."
+    chmod +x "$DOTFILES/git/setup.sh"
+    "$DOTFILES/git/setup.sh"
+else
+    print_warning "Git setup script not found at $DOTFILES/git/setup.sh"
+fi
+
+print_step "Setting up Homebrew"
+if ! command -v brew &> /dev/null; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    print_success "Homebrew installed"
+    
+    if [[ -d "/opt/homebrew/bin" ]]; then
+        export PATH="/opt/homebrew/bin:$PATH"
+    elif [[ -d "/usr/local/bin" ]]; then
+        export PATH="/usr/local/bin:$PATH"
+    fi
+else
+    print_success "Homebrew already installed"
+fi
+
 print_step "Setting up Node.js environment"
 if [ ! -d "$HOME/.nvm" ]; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
@@ -140,20 +163,6 @@ if ! command -v pnpm &> /dev/null; then
     fi
 else
     print_success "pnpm already installed ($(pnpm --version))"
-fi
-
-print_step "Setting up Homebrew"
-if ! command -v brew &> /dev/null; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    print_success "Homebrew installed"
-    
-    if [[ -d "/opt/homebrew/bin" ]]; then
-        export PATH="/opt/homebrew/bin:$PATH"
-    elif [[ -d "/usr/local/bin" ]]; then
-        export PATH="/usr/local/bin:$PATH"
-    fi
-else
-    print_success "Homebrew already installed"
 fi
 
 # ------------------------------
@@ -252,7 +261,6 @@ if [ -f "$DOTFILES/vscode/setup.sh" ]; then
     "$DOTFILES/vscode/setup.sh"
 else
     print_warning "VS Code setup script not found at $DOTFILES/vscode/setup.sh"
-    print_warning "Please create the modular VS Code setup"
 fi
 
 # ------------------------------
@@ -260,37 +268,49 @@ fi
 # ------------------------------
 print_header "SETUP COMPLETE!"
 
-echo -e "${GREEN}🎉 Dotfiles setup completed successfully!${NC}"
+echo -e "${GREEN}🎉 Complete development environment setup finished!${NC}"
 echo ""
 echo -e "${BLUE}📋 Configuration Summary:${NC}"
 echo "┌─────────────────────────────────────────────────────────────┐"
-echo "│ 🐚 Zsh: $ZSHRC_FILE → ~/.zshrc"
-echo "│ 🎨 Theme: Powerlevel10k with plugins"
-echo "│ 🔧 Tools: NVM, Node.js, pnpm, Homebrew"
-echo "│ 🔤 Font: Fira Code Nerd Font"
-echo "│ 🚀 Raycast: Productivity launcher"
-echo "│ 💻 VS Code: Dracula theme + extensions"
+echo "│ 🐚 Terminal: Zsh + Oh-My-Zsh + Powerlevel10k               │"
+echo "│ 🔧 Development: Git, Homebrew, NVM, Node.js, pnpm          │"
+echo "│ 🔤 Font: Fira Code Nerd Font                               │"
+echo "│ 🚀 Productivity: Raycast, Obsidian, Grammarly             │"
+echo "│ 💻 Editor: VS Code with Dracula theme + extensions        │"
 echo "└─────────────────────────────────────────────────────────────┘"
 echo ""
 echo -e "${BLUE}📁 Dotfiles Structure:${NC}"
 echo "📁 $DOTFILES/"
-echo "├── 📄 .zshrc (or zshrc)"
-echo "├── 📄 p10k.zsh"
+echo "├── 📄 .zshrc (symlinked to ~/.zshrc)"
+echo "├── 📄 p10k.zsh (Powerlevel10k configuration)"
+echo "├── 📁 git/"
+echo "│   └── 📄 setup.sh (Git user configuration)"
 echo "├── 📁 raycast/"
-echo "│   └── 📄 setup.sh"
+echo "│   └── 📄 setup.sh (Launcher setup)"
+echo "├── 📁 obsidian/"
+echo "│   └── 📄 setup.sh (Knowledge management)"
 echo "├── 📁 vscode/"
-echo "│   ├── 📄 settings.json"
-echo "│   ├── 📄 extensions.yml"
-echo "│   └── 📄 setup.sh"
-echo "├── 📄 setup.sh (this script)"
-echo "└── 📁 oh-my-zsh/"
+echo "│   ├── 📄 settings.json (Editor configuration)"
+echo "│   ├── 📄 extensions.yml (Extensions list)"
+echo "│   ├── 📄 setup.sh (Editor setup)"
+echo "│   └── 📄 fix.sh (Repair tool)"
+echo "├── 📄 setup.sh (this main script)"
+echo "└── 📁 oh-my-zsh/ (terminal framework)"
 echo ""
 echo -e "${BLUE}🚀 Next Steps:${NC}"
 echo "1. Close and reopen your terminal (or run 'source ~/.zshrc')"
 if [ ! -f "$DOTFILES/p10k.zsh" ]; then
-    echo "2. Run 'p10k configure' to set up your Powerlevel10k theme"
+    echo "2. Run 'p10k configure' to customize your terminal theme"
 fi
-echo "3. Complete initial setup for Raycast, Obsidian, and Grammarly"
-echo "4. Your configuration is now consistent across all terminals and apps!"
+echo "3. Test your Git configuration with 'git config --list'"
+echo "4. Press ⌘+Space to test Raycast launcher"
+echo "5. Open VS Code and verify Dracula theme and extensions"
+echo "6. Create your first Obsidian vault for knowledge management"
 echo ""
-echo -e "${GREEN}Happy coding! 🎯${NC}"
+echo -e "${BLUE}🔧 Individual Module Setup:${NC}"
+echo "  ./git/setup.sh      → Configure Git credentials only"
+echo "  ./vscode/setup.sh   → Install VS Code extensions only"
+echo "  ./raycast/setup.sh  → Setup Raycast launcher only"
+echo "  ./obsidian/setup.sh → Install Obsidian only"
+echo ""
+echo -e "${GREEN}Your complete development environment is ready! 🎯${NC}"
